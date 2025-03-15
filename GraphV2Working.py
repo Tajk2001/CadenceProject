@@ -1,0 +1,171 @@
+"""
+Cycling Data Dashboard
+
+This script processes a .FIT file and creates an interactive cycling data dashboard using Dash and Plotly.
+It extracts key cycling metrics (Power, Cadence, Speed, Heart Rate, Elevation, Temperature, Gear Shifts)
+and allows users to analyze their ride data with interactive graphs.
+
+Features:
+- Plots multiple cycling metrics on a single interactive graph
+- Allows toggling between Time and Distance as the X-axis
+- Provides a summary table with Min, Avg, and Max values
+- Includes a clickable legend to show/hide variables
+- Handles missing data and ensures a smooth experience
+
+To run:
+1. Install dependencies if needed: `pip install pandas plotly dash fitparse`
+2. Run the script: `python your_script.py`
+3. Open the local web server (http://127.0.0.1:8050) in your browser.
+
+"""
+
+import pandas as pd
+import plotly.graph_objects as go
+import dash
+from dash import dcc, html, dash_table, Input, Output
+from fitparse import FitFile
+
+# Load the FIT file
+file_path = r"C:\Users\User\Downloads\TestDataTwo.fit"
+fitfile = FitFile(file_path)
+
+# Dictionary to store all time-based data
+data = {}
+
+# Extract record data (Power, Cadence, Speed, HR, etc.)
+for record in fitfile.get_messages("record"):
+    record_data = {field.name: field.value for field in record}
+    timestamp = record_data.get("timestamp")
+
+    if timestamp:
+        data.setdefault(timestamp, {}).update({
+            "Power": record_data.get("power", None),
+            "Cadence": record_data.get("cadence", None),
+            "Speed": record_data.get("speed", None),  # Speed added
+            "Distance": record_data.get("distance", None),  # Distance added
+            "Elevation": record_data.get("altitude", None),
+            "Heart Rate": record_data.get("heart_rate", None),
+            "Temperature": record_data.get("temperature", None),
+        })
+
+# Extract gear shift events
+last_front_gear, last_rear_gear = None, None
+
+for event in fitfile.get_messages("event"):
+    event_data = {field.name: field.value for field in event}
+    timestamp = event_data.get("timestamp")
+
+    if timestamp:
+        front_gear = event_data.get("front_gear")
+        rear_gear = event_data.get("rear_gear")
+
+        if front_gear is not None:
+            last_front_gear = front_gear
+            data.setdefault(timestamp, {}).update({"Front Gear": last_front_gear})
+
+        if rear_gear is not None:
+            last_rear_gear = rear_gear
+            data.setdefault(timestamp, {}).update({"Rear Gear": last_rear_gear})
+
+# Convert dictionary to Pandas DataFrame
+df = pd.DataFrame.from_dict(data, orient="index").reset_index()
+df.rename(columns={"index": "Time"}, inplace=True)
+
+# Convert timestamps to seconds relative to the first timestamp
+df["Time"] = (df["Time"] - df["Time"][0]).dt.total_seconds()
+
+# Fill missing values safely (Avoid FutureWarnings)
+df.loc[:, "Front Gear"] = df["Front Gear"].ffill()
+df.loc[:, "Rear Gear"] = df["Rear Gear"].ffill()
+df.loc[:, "Gear Ratio"] = (df["Front Gear"] / df["Rear Gear"]).replace([float("inf"), -float("inf")], None).ffill()
+
+# Convert speed to km/h
+df.loc[:, "Speed"] = df["Speed"] * 3.6  # Convert from m/s to km/h
+
+# Ensure Distance starts from zero and is forward-filled correctly
+df.loc[:, "Distance"] = (df["Distance"] - df["Distance"].min()).ffill()
+
+# Fill other missing values
+df = df.ffill()
+
+# Create Dash app
+app = dash.Dash(__name__)
+
+app.layout = html.Div(children=[
+    html.H1("Cycling Data Dashboard"),
+
+    # Button to toggle X-axis between Time and Distance
+    html.Button("Switch X-Axis: Time/Distance", id="toggle-axis", n_clicks=0),
+
+    # Graph
+    dcc.Graph(id="cycling-graph"),
+
+    # Summary Table
+    html.H2("Summary Statistics"),
+    dash_table.DataTable(
+        id="summary-table",
+        style_table={'overflowX': 'auto'},
+        style_cell={'padding': '5px', 'textAlign': 'left'}
+    )
+])
+
+
+@app.callback(
+    [Output("cycling-graph", "figure"),
+     Output("summary-table", "data"),
+     Output("summary-table", "columns")],
+    [Input("toggle-axis", "n_clicks")]
+)
+def update_graph(n_clicks):
+    # Determine X-axis: Time or Distance
+    x_axis = "Time" if n_clicks % 2 == 0 else "Distance"
+    x_label = "Time (s)" if x_axis == "Time" else "Distance (km)"
+
+    # Create interactive Plotly figure
+    fig = go.Figure()
+
+    # Add primary y-axis traces
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Power"], mode='lines', name='Power (W)', yaxis="y1"))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Cadence"], mode='lines', name='Cadence (RPM)', yaxis="y2"))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Speed"], mode='lines', name='Speed (km/h)', yaxis="y3"))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Elevation"], mode='lines', name='Elevation (m)', yaxis="y4"))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Heart Rate"], mode='lines', name='Heart Rate (BPM)', yaxis="y5"))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Temperature"], mode='lines', name='Temperature (°C)', yaxis="y6"))
+
+    # Add secondary y-axis for gears
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Front Gear"], mode='lines+markers', name='Front Gear', yaxis="y7",
+                             line=dict(dash='dash')))
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Rear Gear"], mode='lines+markers', name='Rear Gear', yaxis="y7",
+                             line=dict(dash='dot')))
+
+    # Add Gear Ratio
+    fig.add_trace(go.Scatter(x=df[x_axis], y=df["Gear Ratio"], mode='lines', name='Gear Ratio', yaxis="y8",
+                             line=dict(color='cyan', width=2)))
+
+    # Configure multiple y-axes
+    fig.update_layout(
+        title=f"Cycling Data Analysis ({x_label} as X-Axis)",
+        xaxis=dict(title=x_label),
+        yaxis=dict(title="Power (W)", showgrid=False, side="left", color='blue'),
+        yaxis2=dict(title="Cadence (RPM)", overlaying="y", side="right", color='green'),
+        yaxis3=dict(title="Speed (km/h)", overlaying="y", side="left", anchor="free", position=0.05, color='magenta'),
+        yaxis4=dict(title="Elevation (m)", overlaying="y", side="right", anchor="free", position=0.15, color='brown'),
+        yaxis5=dict(title="Heart Rate (BPM)", overlaying="y", side="left", anchor="free", position=0.25, color='red'),
+        yaxis6=dict(title="Temperature (°C)", overlaying="y", side="right", anchor="free", position=0.35,
+                    color='orange'),
+        yaxis7=dict(title="Gear Shifts", overlaying="y", side="left", anchor="free", position=0.45, color='purple'),
+        yaxis8=dict(title="Gear Ratio", overlaying="y", side="right", anchor="free", position=0.55, color='cyan'),
+        legend=dict(title="Click to Toggle Variables"),
+        hovermode="x"
+    )
+
+    # Create summary statistics table
+    summary = df.drop(columns=["Time", "Distance"]).describe().loc[["min", "mean", "max"]]
+    summary_table = summary.reset_index().round(2)
+
+    return fig, summary_table.to_dict("records"), [{"name": i, "id": i} for i in summary_table.columns]
+
+
+# Run Dash app
+if __name__ == '__main__':
+    app.run(debug=True)
