@@ -82,8 +82,12 @@ for file_idx, file_path in enumerate(fit_files):
     # Compute Gradient
     df["Gradient"] = df["Elevation"].diff() / df["Distance"].diff()
 
-    # FIX: Replace NaNs and Infs
+    # Compute Effective Gradient (velocity-adjusted)
+    df["Effective_Gradient"] = df["Gradient"] * (1 + (df["Speed"] / df["Speed"].mean()))
+
+    # Replace NaNs and infinite values
     df["Gradient"] = df["Gradient"].replace([np.inf, -np.inf], np.nan).fillna(0)
+    df["Effective_Gradient"] = df["Effective_Gradient"].replace([np.inf, -np.inf], np.nan).fillna(0)
 
     # Compute Rate of Change Variables at Multiple Time Intervals
     time_intervals = [1, 3, 10, 30]
@@ -94,6 +98,7 @@ for file_idx, file_path in enumerate(fit_files):
         df[f"Elevation_Δ_{interval}s"] = df["Elevation"].diff(periods=interval)
         df[f"Heart_Rate_Δ_{interval}s"] = df["Heart_Rate"].diff(periods=interval)
         df[f"Gradient_Δ_{interval}s"] = df["Gradient"].diff(periods=interval)
+        df[f"Effective_Gradient_Δ_{interval}s"] = df["Effective_Gradient"].diff(periods=interval)
 
     df.fillna(0, inplace=True)
 
@@ -104,8 +109,8 @@ for file_idx, file_path in enumerate(fit_files):
 full_df = pd.concat(all_rides, ignore_index=True)
 
 # **Analysis on Combined Data**
-expected_features = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Gear_Ratio"] + \
-                    [f"{var}_Δ_{interval}s" for interval in time_intervals for var in ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient"]]
+expected_features = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient", "Gear_Ratio"] + \
+                    [f"{var}_Δ_{interval}s" for interval in time_intervals for var in ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient"]]
 
 # Remove Infinite Values
 full_df.replace([np.inf, -np.inf], np.nan, inplace=True)
