@@ -20,7 +20,7 @@ all_rides = []
 # Process each file separately
 for file_idx, file_path in enumerate(fit_files):
     fitfile = FitFile(file_path)
-    ride_id = f"Ride_{file_idx + 1}"  # Unique ID for each ride
+    ride_id = f"Ride_{file_idx+1}"  # Unique ID for each ride
 
     # Extract data
     data = {}
@@ -108,14 +108,45 @@ for file_idx, file_path in enumerate(fit_files):
 # Combine all rides into one dataset
 full_df = pd.concat(all_rides, ignore_index=True)
 
-# Ensure we only use numeric columns for correlation analysis
-numeric_df = full_df.select_dtypes(include=[np.number])
+# **Analysis on Combined Data**
+expected_features = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient", "Gear_Ratio"] + \
+                    [f"{var}_Δ_{interval}s" for interval in time_intervals for var in ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient"]]
 
-# Compute correlation matrix
-corr_matrix = numeric_df.corr()
+# Remove Infinite Values
+full_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+full_df.fillna(0, inplace=True)
 
+# Logistic Regression (Shift vs No Shift)
+X = full_df[expected_features]
+X = sm.add_constant(X, has_constant='add')  # Ensure constant is added properly
+y = full_df["Shift"]
+logit_model = sm.Logit(y, X).fit(method="newton", maxiter=2000)
 
-# Generate ranked correlation pairs, excluding comparisons between like variables
+print("\nLogistic Regression Model (Shift vs No Shift)")
+print(logit_model.summary())
+
+# Multinomial Logistic Regression Model
+df_shifts = full_df[full_df["Shift"] == 1].copy()
+df_shifts["Shift_Type_Numeric"] = df_shifts["Shift_Type"].map({"Easier": 0, "Harder": 1})
+
+X_shifts = df_shifts[X.columns.intersection(df_shifts.columns)]
+y_shifts = df_shifts["Shift_Type_Numeric"]
+
+mnlogit_model = sm.MNLogit(y_shifts, X_shifts).fit(method="newton", maxiter=2000)
+print("\nMultinomial Logistic Regression Model (Shift Type)")
+print(mnlogit_model.summary())
+
+# Linear Regression Model for Shift Magnitude
+lm_formula = "Shift_Magnitude ~ " + " + ".join(X_shifts.columns)
+lm = ols(lm_formula, data=df_shifts).fit()
+
+print("\nLinear Regression Model (Shift Magnitude)")
+print(lm.summary())
+
+# **Correlation Analysis**
+corr_matrix = full_df[expected_features].corr()
+
+# Generate ranked correlation pairs, excluding like variables
 corr_pairs = (
     corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
     .stack()
@@ -124,28 +155,12 @@ corr_pairs = (
 corr_pairs.columns = ["Variable 1", "Variable 2", "Correlation"]
 corr_pairs["Abs Correlation"] = corr_pairs["Correlation"].abs()
 
-
-# Function to exclude comparisons between similar variables
-def is_same_category(var1, var2):
-    base_categories = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient"]
-
-    # Prevent direct and rate-of-change comparisons within the same category
-    for cat in base_categories:
-        if cat in var1 and cat in var2:
-            return True
-    return False
-
-
-# Filter out like-variable comparisons
-filtered_corr_pairs = corr_pairs[
-    ~corr_pairs.apply(lambda x: is_same_category(x["Variable 1"], x["Variable 2"]), axis=1)]
-
 # Sort by absolute correlation strength
-filtered_corr_pairs = filtered_corr_pairs.sort_values(by="Abs Correlation", ascending=False)
+corr_pairs = corr_pairs.sort_values(by="Abs Correlation", ascending=False)
 
 # Print top correlations
-print("\nRanked Correlation Table (Excluding Like Variables):")
-print(filtered_corr_pairs.head(20))
+print("\nRanked Correlation Table:")
+print(corr_pairs.head(20))
 
 # Plot correlation heatmap
 plt.figure(figsize=(12, 8))
