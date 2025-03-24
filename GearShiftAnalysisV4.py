@@ -160,7 +160,7 @@ corr_pairs = corr_pairs.sort_values(by="Abs Correlation", ascending=False)
 
 # Print top correlations
 print("\nRanked Correlation Table:")
-print(corr_pairs.head(20))
+print(corr_pairs.head(40))
 
 # Plot correlation heatmap
 plt.figure(figsize=(12, 8))
