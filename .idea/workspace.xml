@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Working output">
-      <change afterPath="$PROJECT_DIR$/GearShiftAnalysisV5.py" afterDir="false" />
-    </list>
+    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Working output" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -110,7 +108,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742838848454</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Working output">
+      <option name="closed" value="true" />
+      <created>1742843892356</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1742843892357</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
