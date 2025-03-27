@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Working output" />
+    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Working output">
+      <change afterPath="$PROJECT_DIR$/GearShiftAnalysisV6.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GearShiftAnalysisV5.py" beforeDir="false" afterPath="$PROJECT_DIR$/GearShiftAnalysisV5.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,24 +41,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.GearSHiftAnalysisV3.executor": "Run",
-    "Python.GearShiftAnalysisV2.executor": "Run",
-    "Python.GearShiftAnalysisV3.executor": "Run",
-    "Python.GearShiftAnalysisV4.executor": "Run",
-    "Python.GearShiftAnalysisV5.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.GearSHiftAnalysisV3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV4.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV5.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/tajkr/Desktop/Codeing/CyclingProjectCode&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-14705d77f0bb-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.25659.43" />
+        <option value="bundled-js-predefined-d6986cc7102b-7c0b70fcd90d-JavaScript-PY-242.21829.153" />
+        <option value="bundled-python-sdk-464836ebc622-b74155a9e76b-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.21829.153" />
       </set>
     </attachedChunks>
   </component>
@@ -67,6 +73,7 @@
       <option name="presentableId" value="Default" />
       <updated>1741298027817</updated>
       <workItem from="1741298030168" duration="24000" />
+      <workItem from="1743027524180" duration="9000" />
     </task>
     <task id="LOCAL-00001" summary="Adjusted V4 to handle multiple files, v3 has a clear correlation table added">
       <option name="closed" value="true" />
