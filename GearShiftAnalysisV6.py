@@ -1,3 +1,4 @@
+
 # --- Imports ---
 import pandas as pd
 import numpy as np
@@ -12,9 +13,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 # --- Parameters ---
-folder_path = r"C:\\Users\\tajkr\\Desktop\\FitFiles"
+folder_path = r"C:\\Users\\User\\Desktop\\FitFiles"
 
 # --- Lag/Lead Feature Generator ---
 def add_lagged_lead_features(df):
@@ -22,6 +25,12 @@ def add_lagged_lead_features(df):
     for var in variables:
         df[f"{var}_lag_5s"] = df[var].shift(5)
         df[f"{var}_lead_5s"] = df[var].shift(-5)
+    return df
+
+# --- Rolling Average Features ---
+def add_rolling_features(df, window=3):
+    for var in ["Power", "Cadence", "Heart_Rate", "Speed", "Effective_Gradient", "Gradient"]:
+        df[f"{var}_roll{window}s"] = df[var].rolling(window=window, center=True, min_periods=1).mean()
     return df
 
 # --- FIT File Parser ---
@@ -42,19 +51,14 @@ def parse_fit_file(file_path, ride_id):
                 "Heart_Rate": record_data.get("heart_rate"),
             })
 
-    last_front_gear, last_rear_gear = None, None
     for event in fitfile.get_messages("event"):
         event_data = {field.name: field.value for field in event}
         timestamp = event_data.get("timestamp")
         if timestamp:
-            front_gear = event_data.get("front_gear")
-            rear_gear = event_data.get("rear_gear")
-            if front_gear is not None:
-                last_front_gear = front_gear
-                data.setdefault(timestamp, {}).update({"Front_Gear": front_gear})
-            if rear_gear is not None:
-                last_rear_gear = rear_gear
-                data.setdefault(timestamp, {}).update({"Rear_Gear": rear_gear})
+            if event_data.get("front_gear") is not None:
+                data.setdefault(timestamp, {})["Front_Gear"] = event_data["front_gear"]
+            if event_data.get("rear_gear") is not None:
+                data.setdefault(timestamp, {})["Rear_Gear"] = event_data["rear_gear"]
 
     df = pd.DataFrame.from_dict(data, orient="index").reset_index()
     df.rename(columns={"index": "Time"}, inplace=True)
@@ -64,6 +68,7 @@ def parse_fit_file(file_path, ride_id):
     df[["Front_Gear", "Rear_Gear"]] = df[["Front_Gear", "Rear_Gear"]].ffill()
     df["Gear_Ratio"] = df["Front_Gear"] / df["Rear_Gear"].replace(0, np.nan)
     df["Gear_Ratio_Change"] = df["Gear_Ratio"].diff()
+    df["Speed"] = df["Speed"] * 3.6  # Convert from m/s to km/h
     df["Shift"] = df["Gear_Ratio_Change"].apply(lambda x: 1 if abs(x) > 0 else 0)
     df["Shift_Type"] = np.where(df["Gear_Ratio_Change"] > 0, "Harder",
                                 np.where(df["Gear_Ratio_Change"] < 0, "Easier", "No Shift"))
@@ -76,13 +81,13 @@ def parse_fit_file(file_path, ride_id):
     df.fillna(0, inplace=True)
 
     df = add_lagged_lead_features(df)
+    df = add_rolling_features(df, window=3)
     df.fillna(0, inplace=True)
     return df
 
 # --- Regression Models ---
 def run_logistic_regression(df, features, target="Shift"):
-    X = df[features].copy()
-    X = sm.add_constant(X, has_constant='add')
+    X = sm.add_constant(df[features])
     y = df[target]
     model = sm.Logit(y, X).fit(method="newton", maxiter=2000)
     print("\nLogistic Regression Model (Shift vs No Shift)")
@@ -92,8 +97,7 @@ def run_logistic_regression(df, features, target="Shift"):
 def run_multinomial_logistic(df, features):
     df = df[df["Shift"] == 1].copy()
     df["Shift_Type_Numeric"] = df["Shift_Type"].map({"Easier": 0, "Harder": 1})
-    X = df[features].copy()
-    X = sm.add_constant(X, has_constant='add')
+    X = sm.add_constant(df[features])
     y = df["Shift_Type_Numeric"]
     model = sm.MNLogit(y, X).fit(method="newton", maxiter=2000)
     print("\nMultinomial Logistic Regression Model (Shift Type)")
@@ -107,88 +111,41 @@ def run_linear_regression(df, features, target="Shift_Magnitude"):
     print(model.summary())
     return model
 
-# --- Correlation Analysis ---
+# --- Correlation + Visualization ---
 def correlation_analysis(df, features):
     corr_matrix = df[features].corr()
-    corr_pairs = (
-        corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-        .stack()
-        .reset_index()
-    )
-    corr_pairs.columns = ["Variable 1", "Variable 2", "Correlation"]
-    corr_pairs["Abs Correlation"] = corr_pairs["Correlation"].abs()
-    corr_pairs = corr_pairs.sort_values(by="Abs Correlation", ascending=False)
-
-    print("\nTop Correlation Pairs:")
-    print(corr_pairs.head(20))
-
     plt.figure(figsize=(12, 8))
     sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
     plt.title("Correlation Matrix")
     plt.show()
 
-# --- Policy Modeling ---
-def create_state_action_dataset(df):
-    df = df.copy()
-    df["Action"] = df["Shift_Type"].map({"No Shift": 0, "Easier": 1, "Harder": 2})
-    state_vars = [
-        "Power", "Cadence", "Speed", "Gradient", "Effective_Gradient",
-        "Heart_Rate", "Gear_Ratio",
-        "Cadence_lag_5s", "Cadence_lead_5s",
-        "Power_lag_5s", "Power_lead_5s"
-    ]
-    return df.dropna(subset=state_vars + ["Action"])[state_vars + ["Action"]]
+    top_corr = (
+        corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+        .stack()
+        .reset_index()
+    )
+    top_corr.columns = ["Variable 1", "Variable 2", "Correlation"]
+    top_corr["Abs Correlation"] = top_corr["Correlation"].abs()
+    top_corr = top_corr.sort_values("Abs Correlation", ascending=False)
+    print("\nTop Correlation Pairs:")
+    print(top_corr.head(20))
 
-def train_policy_model(state_action_df):
-    X = state_action_df.drop("Action", axis=1)
-    y = state_action_df["Action"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
-    model = LogisticRegression(multi_class='multinomial', max_iter=1000)
-    model.fit(X_train, y_train)
-    print("\n🚴 Policy Model Evaluation:")
-    print(classification_report(y_test, model.predict(X_test), target_names=["No Shift", "Easier", "Harder"]))
-    return model, X
+    # Additional visualizations
+    sns.boxplot(data=df, x="Shift_Type", y="Power")
+    plt.title("Power by Shift Type")
+    plt.show()
 
-def interpret_policy_model(model, feature_names):
-    coef_df = pd.DataFrame(model.coef_, columns=feature_names, index=["Easier vs No Shift", "Harder vs No Shift"])
-    print("\n🧠 Policy Model Coefficients:")
-    print(coef_df.T.sort_values(by="Harder vs No Shift", ascending=False))
+    sns.boxplot(data=df, x="Shift_Type", y="Cadence")
+    plt.title("Cadence by Shift Type")
+    plt.show()
 
-def detect_policy_deviations(state_action_df, model):
-    df = state_action_df.copy()
-    X = df.drop("Action", axis=1)
-    df["Predicted_Action"] = model.predict(X)
-    df["Deviation"] = df["Action"] != df["Predicted_Action"]
-    return df[df["Deviation"] == True]
+    sns.scatterplot(data=df, x="Gradient", y="Cadence", hue="Shift_Type", alpha=0.3)
+    plt.title("Gradient vs Cadence Colored by Shift Type")
+    plt.show()
 
-# --- Shift Prediction Modeling ---
-def build_shift_prediction_dataset(df, window=5):
-    rows = []
-    shift_indices = df.index[df["Shift"] == 1]
-
-    for idx in shift_indices:
-        if idx - window < 0 or idx + window >= len(df):
-            continue
-        row = {"Shift": 1, "Shift_Type": df.loc[idx, "Shift_Type"]}
-        for offset in range(-window, 0):
-            for var in ["Power", "Cadence", "Speed", "Gradient", "Effective_Gradient", "Heart_Rate"]:
-                row[f"{var}_t{offset}"] = df.loc[idx + offset, var]
-        for offset in range(1, window + 1):
-            for var in ["Cadence", "Power"]:
-                row[f"{var}_t+{offset}"] = df.loc[idx + offset, var]
-        rows.append(row)
-
-    return pd.DataFrame(rows)
-
-def train_shift_classifier(shift_df):
-    X = shift_df.drop(columns=["Shift", "Shift_Type"])
-    y = shift_df["Shift"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=42)
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
-    print("\n⏱ Shift Classifier Evaluation:")
-    print(classification_report(y_test, model.predict(X_test)))
-    return model
+    print_ride_summary_stats(all_rides)
+    full_df = pd.concat(all_rides, ignore_index=True)
+    print(f"\nAll rides processed. Total rows: {len(full_df)}")
 
 # --- Main ---
 if __name__ == "__main__":
@@ -204,30 +161,68 @@ if __name__ == "__main__":
     full_df = pd.concat(all_rides, ignore_index=True)
     print(f"\nAll rides processed. Total rows: {len(full_df)}")
 
-    base_vars = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient", "Gear_Ratio"]
-    lag_lead_vars = [
-        "Effective_Gradient_lag_5s", "Effective_Gradient_lead_5s",
-        "Cadence_lag_5s", "Cadence_lead_5s",
-        "Power_lag_5s", "Power_lead_5s",
-        "Heart_Rate_lag_5s", "Heart_Rate_lead_5s",
-        "Speed_lag_5s", "Speed_lead_5s",
-        "Gear_Ratio_lag_5s", "Gear_Ratio_lead_5s"
-    ]
-    expected_features = base_vars + lag_lead_vars
+    full_df.dropna(subset=["Power", "Cadence", "Speed", "Heart_Rate", "Elevation", "Distance"], inplace=True)
+    full_df = full_df[(full_df["Power"] >= 0) & (full_df["Power"] <= 2000)]
+    full_df = full_df[(full_df["Heart_Rate"] >= 30) & (full_df["Heart_Rate"] <= 220)]
+    full_df = full_df[(full_df["Cadence"] >= 10) & (full_df["Cadence"] <= 180)]
+    full_df = full_df[(full_df["Speed"] >= 0) & (full_df["Speed"] <= 120)]
 
-    logit_model = run_logistic_regression(full_df, expected_features)
-    mnlogit_model = run_multinomial_logistic(full_df, expected_features)
-    ols_model = run_linear_regression(full_df[full_df["Shift"] == 1], expected_features)
-    correlation_analysis(full_df, expected_features)
+    expected_features = [col for col in full_df.columns if "_lag" in col or "_lead" in col or "_roll3s" in col or col in [
+        "Power", "Cadence", "Heart_Rate", "Speed", "Gear_Ratio", "Gradient", "Effective_Gradient", "Elevation"
+    ]]
 
-    state_action_df = create_state_action_dataset(full_df)
-    policy_model, X_features = train_policy_model(state_action_df)
-    interpret_policy_model(policy_model, X_features.columns)
-    deviations_df = detect_policy_deviations(state_action_df, policy_model)
-    print(f"\n🚨 Found {len(deviations_df)} policy deviations out of {len(state_action_df)} actions")
+    full_df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    full_df.dropna(subset=expected_features, inplace=True)
 
-    shift_prediction_df = build_shift_prediction_dataset(full_df, window=5)
-    if not shift_prediction_df.empty:
-        shift_classifier = train_shift_classifier(shift_prediction_df)
-    else:
-        print("No valid shift-centered windows found for prediction dataset.")
+
+    def print_ride_summary_stats(all_rides):
+        summary_rows = []
+        for ride_df in all_rides:
+            ride_id = ride_df["Ride_ID"].iloc[0]
+            row = {
+                "Ride_ID": ride_id,
+                "Power_mean": ride_df["Power"].mean(),
+                "Power_min": ride_df["Power"].min(),
+                "Power_max": ride_df["Power"].max(),
+                "Cadence_mean": ride_df["Cadence"].mean(),
+                "Cadence_min": ride_df["Cadence"].min(),
+                "Cadence_max": ride_df["Cadence"].max(),
+                "Heart_Rate_mean": ride_df["Heart_Rate"].mean(),
+                "Heart_Rate_min": ride_df["Heart_Rate"].min(),
+                "Heart_Rate_max": ride_df["Heart_Rate"].max(),
+                "Speed_mean": ride_df["Speed"].mean(),
+                "Speed_min": ride_df["Speed"].min(),
+                "Speed_max": ride_df["Speed"].max(),
+                "Elevation_mean": ride_df["Elevation"].mean(),
+                "Elevation_min": ride_df["Elevation"].min(),
+                "Elevation_max": ride_df["Elevation"].max(),
+            }
+            summary_rows.append(row)
+        summary_df = pd.DataFrame(summary_rows)
+        print("\n📊 Ride Summary Statistics (Per Ride):")
+        print(summary_df.to_string(index=False))
+
+
+    def drop_high_vif(df, feature_list, threshold=200.0):
+        X = df[feature_list].copy()
+        while True:
+            vif_data = pd.DataFrame()
+            vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+            vif_data["Feature"] = X.columns
+            max_vif = vif_data["VIF"].max()
+            if max_vif > threshold:
+                drop_feature = vif_data.loc[vif_data["VIF"].idxmax(), "Feature"]
+                print(f"Dropping {drop_feature} due to high VIF: {max_vif:.2f}")
+                X.drop(columns=[drop_feature], inplace=True)
+            else:
+                break
+        return list(X.columns)
+
+    reduced_features = drop_high_vif(full_df, expected_features)
+    scaler = StandardScaler()
+    full_df[reduced_features] = scaler.fit_transform(full_df[reduced_features])
+
+    logit_model = run_logistic_regression(full_df, reduced_features)
+    mnlogit_model = run_multinomial_logistic(full_df, reduced_features)
+    ols_model = run_linear_regression(full_df[full_df["Shift"] == 1], reduced_features)
+    correlation_analysis(full_df, reduced_features)
