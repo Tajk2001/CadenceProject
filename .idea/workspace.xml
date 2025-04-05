@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Working output">
+      <change afterPath="$PROJECT_DIR$/V5_Var_Selection.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GearShiftAnalysisV5.py" beforeDir="false" afterPath="$PROJECT_DIR$/GearShiftAnalysisV5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GearShiftAnalysisV6.py" beforeDir="false" afterPath="$PROJECT_DIR$/GearShiftAnalysisV6.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,22 +41,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.GearSHiftAnalysisV3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.GearShiftAnalysisV2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.GearShiftAnalysisV3.executor&quot;: &quot;Run&quot;,
-    &quot;Python.GearShiftAnalysisV4.executor&quot;: &quot;Run&quot;,
-    &quot;Python.GearShiftAnalysisV5.executor&quot;: &quot;Run&quot;,
-    &quot;Python.GearShiftAnalysisV6.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/tajkr/Desktop/Codeing/CyclingProjectCode&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.GearSHiftAnalysisV3.executor": "Run",
+    "Python.GearShiftAnalysisV2.executor": "Run",
+    "Python.GearShiftAnalysisV3.executor": "Run",
+    "Python.GearShiftAnalysisV4.executor": "Run",
+    "Python.GearShiftAnalysisV5.executor": "Run",
+    "Python.GearShiftAnalysisV6.executor": "Run",
+    "Python.GearShiftAnalysisV6_Corrected (1).executor": "Run",
+    "Python.GearShiftAnalysisV6_Corrected.executor": "Run",
+    "Python.GearShiftAnalysisV6_Corrected_Final.executor": "Run",
+    "Python.GearShiftAnalysisV6_Final_WithRollingNorm.executor": "Run",
+    "Python.GearShiftAnalysisV6_Updated (1).executor": "Run",
+    "Python.GearShiftAnalysisV6_Updated.executor": "Run",
+    "Python.GearShiftAnalysisV6_Updated_Full.executor": "Run",
+    "Python.GearShiftAnalysisV6_WithGraphs.executor": "Run",
+    "Python.GearShiftAnalysisV6_WithGraphs_Summary.executor": "Run",
+    "Python.V5_Var_Selection.executor": "Run",
+    "Python.updated_correlation_function_option3.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/tajkr/Desktop/Codeing/CyclingProjectCode",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -122,7 +134,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742843892357</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Working output">
+      <option name="closed" value="true" />
+      <created>1743743689235</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1743743689235</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -136,9 +156,14 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/GearShiftAnalysisV6.py</url>
+          <url>file://$USER_HOME$/Downloads/updated_correlation_function_option3.py</url>
+          <line>14</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/Downloads/GearShiftAnalysisV6_Corrected.py</url>
           <line>1</line>
-          <option name="timeStamp" value="1" />
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
