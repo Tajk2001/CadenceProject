@@ -169,7 +169,7 @@ def correlation_analysis(df, features):
 
     # Power by Shift Type
     plt.figure(figsize=(8, 5))
-    sns.boxplot(data=unscaled_df, x="Shift_Type", y="Power", palette="pastel")
+    sns.boxplot(data=unscaled_df, x="Shift_Type", y="Power", hue="Shift_Type", palette="pastel", legend=False)
     plt.title("Power Distribution by Shift Type", fontsize=14)
     plt.xlabel("Shift Type", fontsize=12)
     plt.ylabel("Power (Watts)", fontsize=12)
@@ -179,7 +179,7 @@ def correlation_analysis(df, features):
 
     # Cadence by Shift Type
     plt.figure(figsize=(8, 5))
-    sns.boxplot(unscaled_df, x="Shift_Type", y="Cadence", palette="pastel")
+    sns.boxplot(data=unscaled_df, x="Shift_Type", y="Cadence", hue="Shift_Type", palette="pastel", legend=False)
     plt.title("Cadence Distribution by Shift Type", fontsize=14)
     plt.xlabel("Shift Type", fontsize=12)
     plt.ylabel("Cadence (RPM)", fontsize=12)
