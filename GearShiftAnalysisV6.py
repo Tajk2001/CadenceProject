@@ -220,7 +220,7 @@ def run_double_clustering(df, features, n_components=2, n_clusters=3):
     pca = PCA(n_components=n_components)
     pcs = pca.fit_transform(scaled_data)
     explained = pca.explained_variance_ratio_
-    print(f"\n🔢 PCA Explained Variance Ratio: {explained}")
+    print(f"\n PCA Explained Variance Ratio: {explained}")
 
     # --- KMeans on PCA ---
     kmeans_pca = KMeans(n_clusters=n_clusters, random_state=42)
@@ -249,13 +249,13 @@ def run_double_clustering(df, features, n_components=2, n_clusters=3):
     # --- Summary Stats: Original Clustering ---
     orig_cluster_means = df_clean.groupby("Cluster_Original")[features].mean().round(2)
     orig_cluster_means.rename(columns=short_name_map, inplace=True)
-    print("\n📊 Cluster Means (Original Features):")
+    print("\n Cluster Means (Original Features):")
     print(orig_cluster_means.to_string())
 
     # --- Summary Stats: PCA-Based Clustering ---
     pca_cluster_means = df_clean.groupby("Cluster_PCA")[features].mean().round(2)
     pca_cluster_means.rename(columns=short_name_map, inplace=True)
-    print("\n📊 Cluster Means (PCA-based Clustering):")
+    print("\ Cluster Means (PCA-based Clustering):")
     print(pca_cluster_means.to_string())
 
     # --- PCA Scatter Plot ---
@@ -329,7 +329,7 @@ if __name__ == "__main__":
             }
             summary_rows.append(row)
         summary_df = pd.DataFrame(summary_rows)
-        print("\n📊 Ride Summary Statistics (Per Ride):")
+        print("\n Ride Summary Statistics (Per Ride):")
         print(summary_df.to_string(index=False))
 
 

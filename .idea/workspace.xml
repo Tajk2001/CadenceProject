@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Added Clust and PCA, also ride summary, cleaned up graphs and plots">
+    <list default="true" id="96a57ca3-45b4-4cd3-9c6a-799cfbfda700" name="Changes" comment="Double Clusters on original and PCA features">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GearShiftAnalysisV6.py" beforeDir="false" afterPath="$PROJECT_DIR$/GearShiftAnalysisV6.py" afterDir="false" />
     </list>
@@ -40,35 +40,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.GearSHiftAnalysisV3.executor": "Run",
-    "Python.GearShiftAnalysisV2.executor": "Run",
-    "Python.GearShiftAnalysisV3.executor": "Run",
-    "Python.GearShiftAnalysisV4.executor": "Run",
-    "Python.GearShiftAnalysisV5.executor": "Run",
-    "Python.GearShiftAnalysisV6.executor": "Run",
-    "Python.GearShiftAnalysisV6_Corrected (1).executor": "Run",
-    "Python.GearShiftAnalysisV6_Corrected.executor": "Run",
-    "Python.GearShiftAnalysisV6_Corrected_Final.executor": "Run",
-    "Python.GearShiftAnalysisV6_Final_WithRollingNorm.executor": "Run",
-    "Python.GearShiftAnalysisV6_NoGearRatio.executor": "Run",
-    "Python.GearShiftAnalysisV6_NoGearRatio_Final.executor": "Run",
-    "Python.GearShiftAnalysisV6_Updated (1).executor": "Run",
-    "Python.GearShiftAnalysisV6_Updated.executor": "Run",
-    "Python.GearShiftAnalysisV6_Updated_Full.executor": "Run",
-    "Python.GearShiftAnalysisV6_WithGraphs.executor": "Run",
-    "Python.GearShiftAnalysisV6_WithGraphs_Summary.executor": "Run",
-    "Python.V5_Var_Selection.executor": "Run",
-    "Python.updated_correlation_function_option3.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/User/Desktop/Codeing/CadenceProject",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.GearSHiftAnalysisV3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV4.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV5.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Corrected (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Corrected.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Corrected_Final.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Final_WithRollingNorm.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_NoGearRatio.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_NoGearRatio_Final.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Updated (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Updated.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_Updated_Full.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_WithGraphs.executor&quot;: &quot;Run&quot;,
+    &quot;Python.GearShiftAnalysisV6_WithGraphs_Summary.executor&quot;: &quot;Run&quot;,
+    &quot;Python.V5_Var_Selection.executor&quot;: &quot;Run&quot;,
+    &quot;Python.updated_correlation_function_option3.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Codeing/CadenceProject&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Codeing\CadenceProject" />
@@ -172,7 +172,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743822407152</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Double Clusters on original and PCA features">
+      <option name="closed" value="true" />
+      <created>1743826659582</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1743826659582</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -183,7 +191,8 @@
     <MESSAGE value="Cleaner data processing, added Summary table, added pop-up graphs" />
     <MESSAGE value="Added variable selection" />
     <MESSAGE value="Added Clust and PCA, also ride summary, cleaned up graphs and plots" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Clust and PCA, also ride summary, cleaned up graphs and plots" />
+    <MESSAGE value="Double Clusters on original and PCA features" />
+    <option name="LAST_COMMIT_MESSAGE" value="Double Clusters on original and PCA features" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -197,6 +206,11 @@
           <url>file://$USER_HOME$/Downloads/GearShiftAnalysisV6_Corrected.py</url>
           <line>1</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GearShiftAnalysisV6.py</url>
+          <line>319</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
