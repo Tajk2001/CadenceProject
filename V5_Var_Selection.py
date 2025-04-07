@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from fitparse import FitFile
@@ -16,7 +15,7 @@ warnings.filterwarnings("ignore")  # Suppress convergence warnings
 # ---------- PARAMETERS ----------
 folder_path = r"C:\Users\User\Desktop\FitFiles"  # Update this to your directory
 time_intervals = [1, 3, 10, 30]
-remove_multicollinearity = True  # Set to False if you want to keep all features
+remove_multicollinearity = True  # Toggle this to filter multicollinear features
 
 
 # ---------- FUNCTION: PARSE SINGLE FIT FILE ----------
@@ -77,7 +76,21 @@ def parse_fit_file(file_path, ride_id):
     return df
 
 
-# ---------- UTILITY: REMOVE MULTICOLLINEAR FEATURES ----------
+# ---------- FEATURE SELECTION ----------
+def select_features(df, candidate_vars):
+    print("\nAvailable variables for modeling:")
+    for i, var in enumerate(candidate_vars):
+        print(f"{i + 1}: {var}")
+
+    selected_indices = input("\nEnter the numbers of the variables you want to include (comma-separated): ")
+    selected_indices = [int(i.strip()) - 1 for i in selected_indices.split(",")]
+    selected_vars = [candidate_vars[i] for i in selected_indices]
+
+    print(f"\n✅ Selected Features: {selected_vars}\n")
+    return selected_vars
+
+
+# ---------- VIF FILTER ----------
 def remove_high_vif_features(X, threshold=10.0):
     while True:
         vif = pd.Series(
@@ -156,26 +169,40 @@ def correlation_analysis(df, features):
 # ---------- MAIN ----------
 if __name__ == "__main__":
     fit_files = glob(os.path.join(folder_path, "*.fit"))
-    all_rides = []
+    if not fit_files:
+        print(f"No .fit files found in: {folder_path}")
+        exit()
 
+    all_rides = []
     for idx, file_path in enumerate(fit_files):
         ride_id = f"Ride_{idx + 1}"
-        df = parse_fit_file(file_path, ride_id)
-        print(f"Processed: {ride_id} | {file_path}")
-        all_rides.append(df)
+        try:
+            df = parse_fit_file(file_path, ride_id)
+            if not df.empty:
+                all_rides.append(df)
+                print(f"Processed: {ride_id} | {file_path}")
+            else:
+                print(f"Skipped empty DataFrame: {ride_id}")
+        except Exception as e:
+            print(f"Error processing {ride_id} | {file_path}: {e}")
+
+    if not all_rides:
+        print("❌ No usable rides parsed.")
+        exit()
 
     full_df = pd.concat(all_rides, ignore_index=True)
-    print(f"\nAll rides processed. Total rows: {len(full_df)}")
-
     full_df.replace([np.inf, -np.inf], np.nan, inplace=True)
     full_df.fillna(0, inplace=True)
 
     base_vars = ["Power", "Cadence", "Speed", "Elevation", "Heart_Rate", "Gradient", "Effective_Gradient", "Gear_Ratio"]
     delta_vars = [f"{var}_Δ_{interval}s" for interval in time_intervals for var in base_vars if var != "Gear_Ratio"]
-    expected_features = base_vars + delta_vars
+    all_vars = base_vars + delta_vars
 
-    logit_model = run_logistic_regression(full_df, expected_features)
-    mnlogit_model = run_multinomial_logistic(full_df, expected_features)
-    ols_model = run_linear_regression(full_df[full_df["Shift"] == 1], expected_features)
+    selected_features = select_features(full_df, all_vars)
 
-    correlation_analysis(full_df, expected_features)
+    # Run Analyses
+    logit_model = run_logistic_regression(full_df, selected_features)
+    mnlogit_model = run_multinomial_logistic(full_df, selected_features)
+    ols_model = run_linear_regression(full_df[full_df["Shift"] == 1], selected_features)
+
+    correlation_analysis(full_df, selected_features)
