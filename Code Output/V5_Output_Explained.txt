@@ -1,0 +1,22 @@
+# --- Model Interpretations Summary ---
+
+# Logistic Regression (Shift vs No Shift):
+# - Shifts are more likely at higher cadence, heart rate, and elevation.
+# - Less likely when power is high or gear ratio is high (i.e., in harder gears).
+# - Gradient is marginally significant; shifts may precede terrain changes.
+
+# Multinomial Logistic Regression (Shift Type):
+# - Harder shifts occur at higher cadence and lower speed.
+# - Easier shifts are more likely when cadence drops (Cadence_Δ_1s negative).
+# - Gear Ratio is a strong predictor: shifting harder often happens from easier gears.
+# - 30s terrain changes (Gradient_Δ_30s, Effective_Gradient_Δ_30s) are significant.
+
+# Linear Regression (Shift Magnitude):
+# - Larger shifts occur with high cadence and large gear ratios.
+# - Shift magnitude decreases with speed, increases with short-term terrain change.
+# - Terrain and effort dynamics (e.g., Power_Δ_10s, Gradient_Δ_3s) influence shift size.
+
+# Overall:
+# - Strong evidence supports that riders shift to regulate cadence.
+# - Terrain anticipation (especially over 30s) influences both type and magnitude of shifts.
+# - Speed, cadence, and gear state collectively guide shifting behavior.
