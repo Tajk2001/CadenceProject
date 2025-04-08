@@ -3,6 +3,7 @@
 This project analyzes **gear shifting behavior in cyclists** using FIT file data. It applies time series modeling, machine learning, and deep learning (including LSTM and attention mechanisms) to answer the research question:
 
 > **"Why and when do cyclists shift gears?"**
+> More advaced question: To what extent can the timing, type, and magnitude of gear shifts be predicted as a latent behavioral policy in response to changes in physiological and environmental state variables, and can deviations from this modeled strategy be used to identify inefficient or novice shifting behavior?
 
 ---
 
