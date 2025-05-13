@@ -20,7 +20,7 @@ from sklearn.cluster import KMeans
 
 
 # --- Parameters ---
-folder_path = r"C:\\Users\\tajkr\\Desktop\\FitFiles"
+folder_path = r"PUT_FILEPATH_HERE"
 
 # --- Lag/Lead Feature Generator ---
 def add_lagged_lead_features(df):
