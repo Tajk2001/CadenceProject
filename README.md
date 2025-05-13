@@ -1,71 +1,34 @@
-# 🚴 Gear Shift Analysis & Prediction for Cyclists
+# CadenceProject 🚴‍♂️
 
-This project analyzes **gear shifting behavior in cyclists** using FIT file data. It applies time series modeling, machine learning, and deep learning (including LSTM and attention mechanisms) to answer the research question:
-
-> **"Why and when do cyclists shift gears?"**
-> More advaced question: To what extent can the timing, type, and magnitude of gear shifts be predicted as a latent behavioral policy in response to changes in physiological and environmental state variables, and can deviations from this modeled strategy be used to identify inefficient or novice shifting behavior?
+This project analyzes cycling gear shifts and cadence data from `.fit` files using advanced time-series and machine learning techniques. It's built to explore **why and when cyclists shift gears**.
 
 ---
 
-## 🧠 Project Goals
-
-- Parse and clean cycling FIT data
-- Engineer features: gradients, rolling stats, lag/lead metrics
-- Model gear shifting decisions:
-  - Logistic, multinomial, and linear regression
-  - Random Forest with SHAP explainability
-  - LSTM and LSTM + Attention (sequence modeling)
-- Visualize rider behavior, correlations, and feature influence
-- Identify patterns and behavioral policies across rides
+## 📂 Structure
+CadenceProject/
+├── scripts/ # Python scripts for data parsing, modeling, and visualization
+├── data/ # Raw .fit files (ignored in Git)
+├── output/ # Results, plots, model outputs
+├── requirements.txt
+└── README.md
 
 ---
 
-## 📁 Project Structure
+## 🚀 Features
 
-- `GearShiftAnalysis.py`: Main preprocessing, feature engineering, and regression logic
-- `LSTM + Attention`: Deep learning models for sequence-based shift prediction
-- `clustering`: PCA + KMeans clustering for behavioral profiling
-- `visualizations`: Heatmaps, boxplots, scatterplots, SHAP plots
-
----
-
-## 🧪 Models & Interpretability
-
-### ✅ Logistic & Linear Regression
-- Understand how features like cadence, power, gradient affect shift likelihood/magnitude
-
-### 🌲 Random Forest + SHAP
-- Feature importance and local explanations (counterfactual testing)
-
-### 🔁 LSTM / LSTM + Attention
-- Sequence modeling of shift windows
-- **Attention heatmaps** show temporal influence across time steps
+- Parses `.fit` files for cadence, power, HR, and gear data
+- Detects gear shifts (easier, harder, no shift)
+- Computes effective gradient, velocity-adjusted slope
+- Performs:
+  - Logistic and multinomial regression
+  - SHAP interpretability
+  - Random Forest and LSTM predictions
+- Visualizes gear use and shifting behavior
 
 ---
 
-## 📊 Visual Outputs
-
-- 📈 Correlation heatmaps
-- 🎯 SHAP summary plots
-- 📦 Power/Cadence by shift type
-- ⛰️ Gradient vs Cadence (by shift)
-- 🎨 Attention heatmaps (LSTM + Attention)
-- 🌐 PCA scatter plots (cluster analysis)
-
----
-
-## 🔧 Requirements
-
-- Python 3.9+
-- Libraries: `pandas`, `numpy`, `matplotlib`, `seaborn`, `fitparse`, `torch`, `sklearn`, `statsmodels`, `shap`
-
-> ✅ Use `pip install -r requirements.txt` (optional)
-
----
-
-## 📂 Input Data
-
-Place `.fit` files inside:
+## 📦 Setup
 
 ```bash
-C:/Users/USERNAME/Desktop/FitFiles/
+pip install -r requirements.txt
+python scripts/GearShiftAnalysis.py
