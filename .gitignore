@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Data & output
+data/*.fit
+output/*
+*.csv
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
