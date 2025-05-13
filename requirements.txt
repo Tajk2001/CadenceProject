@@ -1,7 +1,9 @@
 pandas
 numpy
-scikit-learn
-statsmodels
-seaborn
+fitparse
 matplotlib
+seaborn
+statsmodels
+scikit-learn
 shap
+torch
