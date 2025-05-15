@@ -26,7 +26,7 @@ from dash import dcc, html, dash_table, Input, Output
 from fitparse import FitFile
 
 # Load the FIT file
-file_path = r"C:\Users\User\Downloads\TestDataTwo.fit"
+file_path = r"C:\Users\User\Downloads\Lunch_Ride.fit"
 fitfile = FitFile(file_path)
 
 # Dictionary to store all time-based data

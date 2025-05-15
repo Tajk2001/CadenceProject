@@ -1,6 +1,6 @@
 from fitparse import FitFile
 
-file_path = r"C:\Users\tajkr\Downloads\TestGear.fit"
+file_path = r"C:\Users\User\Desktop\New folder\165Crank.fit"
 fitfile = FitFile(file_path)
 
 # Print all messages and fields in the FIT file
